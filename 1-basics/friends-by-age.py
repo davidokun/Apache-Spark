@@ -18,7 +18,7 @@ def parse_line(line):
 
 
 # Reade the file and assigned to a RDD lines.
-lines = sc.textFile("file:///SparkCourse/friends-by-age.csv")
+lines = sc.textFile("file:///SparkCourse/files/friends-by-age.csv")
 
 # Apply Map function to each line to get age and number of friends
 rdd = lines.map(parse_line)

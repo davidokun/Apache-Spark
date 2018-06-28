@@ -8,7 +8,7 @@ conf = SparkConf().setMaster("local").setAppName("RatingsHistogram")
 sc = SparkContext(conf=conf)
 
 # Creates and RDD object from the data file
-lines = sc.textFile("file:///SparkCourse/ml-100k/u.data")
+lines = sc.textFile("file:///SparkCourse/files/ml-100k/u.data")
 
 # Apply a map function and store the result in another RDD object
 ratings = lines.map(lambda x: x.split()[2])

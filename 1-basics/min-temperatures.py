@@ -18,7 +18,7 @@ def parse_line(line):
     return station_id, entry_type, temperature
 
 
-lines = sc.textFile("file:///SparkCourse/1800.csv")
+lines = sc.textFile("file:///SparkCourse/files/1800.csv")
 parsedLines = lines.map(parse_line)
 minTemps = parsedLines.filter(lambda x: "TMIN" in x[1])
 stationTemps = minTemps.map(lambda x: (x[0], x[2]))
