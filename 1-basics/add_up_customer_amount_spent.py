@@ -14,16 +14,16 @@ def parse_line(line):
     :return: a tuple with customer and amount
     """
     value = line.split(",")
-    customer = value[0]
-    amount = int(value[1])
+    customer = int(value[0])
+    amount = float(value[2])
     return customer, amount
 
 
-lines = sc.textFile("file:///SparkCourse/files/customers_data.csv")
+lines = sc.textFile("file:///SparkCourse/files/customer-orders.csv")
 customers = lines.map(parse_line)
 addedAmounts = customers.reduceByKey(lambda x, y: x + y)
 
 results = addedAmounts.collect()
 
 for c, v in results:
-    print("{} spent a total of $US {:,}".format(c, v))
+    print("Customer {} spent a total of $US {:.2f}".format(c, v))
