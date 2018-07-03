@@ -22,8 +22,9 @@ def parse_line(line):
 lines = sc.textFile("file:///SparkCourse/files/customer-orders.csv")
 customers = lines.map(parse_line)
 addedAmounts = customers.reduceByKey(lambda x, y: x + y)
+addedAmountsSorted = addedAmounts.map(lambda x: (x[1], x[0])).sortByKey()
 
-results = addedAmounts.collect()
+results = addedAmountsSorted.collect()
 
 for c, v in results:
-    print("Customer {} spent a total of $US {:.2f}".format(c, v))
+    print("Customer {} spent a total of $US {:.2f}".format(v, c))
