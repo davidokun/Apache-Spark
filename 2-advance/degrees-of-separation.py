@@ -73,3 +73,45 @@ def bfs_map(node):
     # Emit the input node so we don't lose it.
     results.append((character_id, (connections, distance, color)))
     return results
+
+
+def bfs_reduce(data1, data2):
+    edges1 = data1[0]
+    edges2 = data2[0]
+    distance1 = data1[1]
+    distance2 = data2[1]
+    color1 = data1[2]
+    color2 = data2[2]
+
+    distance = 9999
+    color = color1
+    edges = []
+
+    # See if one is the original node with its connections.
+    # If so preserve them.
+    if len(edges1) > 0:
+        edges.extend(edges1)
+    if len(edges2) > 0:
+        edges.extend(edges2)
+
+    # Preserve minimum distance
+    if distance1 < distance:
+        distance = distance1
+
+    if distance2 < distance:
+        distance = distance2
+
+    # Preserve darkest color
+    if color1 == 'WHITE' and (color2 == 'GRAY' or color2 == 'BLACK'):
+        color = color2
+
+    if color1 == 'GRAY' and color2 == 'BLACK':
+        color = color2
+
+    if color2 == 'WHITE' and (color1 == 'GRAY' or color1 == 'BLACK'):
+        color = color1
+
+    if color2 == 'GRAY' and color1 == 'BLACK':
+        color = color1
+
+    return edges, distance, color
