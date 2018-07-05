@@ -42,7 +42,7 @@ def create_starting_rdd():
     Reads the input file a parse eac line
     :return:
     """
-    input_file = sc.textFile("file:///SparkCourse/Marvel-Graph.txt")
+    input_file = sc.textFile("file:///SparkCourse/files/Marvel-Graph.txt")
     return input_file.map(convert_to_bfs)
 
 
@@ -115,3 +115,21 @@ def bfs_reduce(data1, data2):
         color = color1
 
     return edges, distance, color
+
+
+# Main program execution
+if __name__ == '__main__':
+    iterationRdd = create_starting_rdd()
+
+    for iteration in range(0, 10):
+        print("Running BFS iteration# " + str(iteration+1))
+
+        mapped = iterationRdd.flatMap(bfs_map)
+
+        print("Processing " + str(mapped.count()) + " values.")
+
+        if hitCounter.value > 0:
+            print("Hit the target character! From " + str(hitCounter.value) + " different direction(s).")
+            break
+
+        iterationRdd = mapped.reduceByKey(bfs_reduce)
