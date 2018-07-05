@@ -44,3 +44,32 @@ def create_starting_rdd():
     """
     input_file = sc.textFile("file:///SparkCourse/Marvel-Graph.txt")
     return input_file.map(convert_to_bfs)
+
+
+def bfs_map(node):
+    character_id = node[0]
+    data = node[1]
+    connections = data[0]
+    distance = data[1]
+    color = data[2]
+
+    results = []
+
+    # If this node needs to be expanded...
+    if color == 'GRAY':
+        for connection in connections:
+            new_character_id = connection
+            new_distance = distance + 1
+            new_color = 'GRAY'
+            if targetCharacterID == connection:
+                hitCounter.add(1)
+
+            new_entry = (new_character_id, ([], new_distance, new_color))
+            results.append(new_entry)
+
+        # We've processed this node, so color it black
+        color = 'BLACK'
+
+    # Emit the input node so we don't lose it.
+    results.append((character_id, (connections, distance, color)))
+    return results
