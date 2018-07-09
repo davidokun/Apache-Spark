@@ -57,3 +57,35 @@ def compute_cosine_similarity(rating_pairs):
         score = (numerator / (float(denominator)))
 
     return (score, numPairs)
+
+
+conf = SparkConf().setMaster("local[*]").setAppName("MovieSimilarities")
+sc = SparkContext(conf=conf)
+
+print("\nLoading movie names...")
+nameDict = load_movie_names()
+
+data = sc.textFile("file:///SparkCourse/files/ml-100k/u.data")
+
+# Map ratings to key / value pairs: user ID => movie ID, rating
+ratings = data.map(lambda l: l.split()).map(lambda l: (int(l[0]), (int(l[1]), float(l[2]))))
+
+# Emit every movie rated together by the same user.
+# Self-join to find every combination.
+joinedRatings = ratings.join(ratings)
+
+# At this point our RDD consists of userID => ((movieID, rating), (movieID, rating))
+
+# Filter out duplicate pairs
+uniqueJoinedRatings = joinedRatings.filter(filter_duplicates)
+
+# Now key by (movie1, movie2) pairs.
+moviePairs = uniqueJoinedRatings.map(make_pairs)
+
+# We now have (movie1, movie2) => (rating1, rating2)
+# Now collect all ratings for each movie pair and compute similarity
+moviePairRatings = moviePairs.groupByKey()
+
+# We now have (movie1, movie2) = > (rating1, rating2), (rating1, rating2) ...
+# Can now compute similarities.
+moviePairSimilarities = moviePairRatings.mapValues(compute_cosine_similarity).cache()
