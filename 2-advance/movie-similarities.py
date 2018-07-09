@@ -89,3 +89,34 @@ moviePairRatings = moviePairs.groupByKey()
 # We now have (movie1, movie2) = > (rating1, rating2), (rating1, rating2) ...
 # Can now compute similarities.
 moviePairSimilarities = moviePairRatings.mapValues(compute_cosine_similarity).cache()
+
+
+# Save the results if desired
+# moviePairSimilarities.sortByKey()
+# moviePairSimilarities.saveAsTextFile("movie-sims")
+
+# Extract similarities for the movie we care about that are "good".
+if len(sys.argv) > 1:
+
+    scoreThreshold = 0.97
+    coOccurenceThreshold = 50
+
+    movieID = int(sys.argv[1])
+
+    # Filter for movies with this sim that are "good" as defined by
+    # our quality thresholds above
+    filteredResults = moviePairSimilarities.filter(lambda pair_sim: \
+                                                       (pair_sim[0][0] == movieID or pair_sim[0][1] == movieID) \
+                                                       and pair_sim[1][0] > scoreThreshold and pair_sim[1][1] > coOccurenceThreshold)
+
+    # Sort by quality score.
+    results = filteredResults.map(lambda pairSim: (pairSim[1], pairSim[0])).sortByKey(ascending=False).take(10)
+
+    print("Top 10 similar movies for " + nameDict[movieID])
+    for result in results:
+        (sim, pair) = result
+        # Display the similarity result that isn't the movie we're looking at
+        similarMovieID = pair[0]
+        if similarMovieID == movieID:
+            similarMovieID = pair[1]
+        print(nameDict[similarMovieID] + "\tscore: " + str(sim[0]) + "\tstrength: " + str(sim[1]))
